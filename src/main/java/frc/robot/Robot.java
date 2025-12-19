@@ -7,6 +7,11 @@ package frc.robot;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.PrintCommand;
+import edu.wpi.first.wpilibj2.command.button.CommandPS4Controller;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
+import frc.robot.subsystems.Arm;
 
 
 /**
@@ -19,6 +24,9 @@ public class Robot extends TimedRobot {
   private static final String kCustomAuto = "My Auto";
   private String m_autoSelected;
   private final SendableChooser<String> m_chooser = new SendableChooser<>();
+  private final Arm arm = new Arm();
+
+  private final CommandPS4Controller controller = new CommandPS4Controller(0);
 
 
   /**
@@ -29,6 +37,11 @@ public class Robot extends TimedRobot {
     m_chooser.setDefaultOption("Default Auto", kDefaultAuto);
     m_chooser.addOption("My Auto", kCustomAuto);
     SmartDashboard.putData("Auto choices", m_chooser);
+
+    controller.povUp().whileTrue(arm.sysidQuasistatic(Direction.kForward));
+    controller.povDown().whileTrue(arm.sysidQuasistatic(Direction.kReverse));
+    controller.povRight().whileTrue(arm.sysidDynamic(Direction.kForward));
+    controller.povLeft().whileTrue(arm.sysidDynamic(Direction.kReverse));
   }
 
   /**
@@ -39,7 +52,9 @@ public class Robot extends TimedRobot {
    * SmartDashboard integrated updating.
    */
   @Override
-  public void robotPeriodic() {}
+  public void robotPeriodic() {
+    CommandScheduler.getInstance().run();
+  }
 
   /**
    * This autonomous (along with the chooser code above) shows how to select between different
