@@ -10,15 +10,17 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.robot.Contants.SysIdSubsystem;
 
-public class SingleMotor extends SubsystemBase {
-  private final TalonFX motor = new TalonFX(0);
+public class TalonSysId extends SubsystemBase implements SysIdSubsystem {
+  private TalonFX motor = new TalonFX(0);
 
   private final TalonFXConfiguration motorConfig = new TalonFXConfiguration();
 
   private VoltageOut voltageControlRequeset = new VoltageOut(0);
 
-  public SingleMotor() {
+  public TalonSysId(int motorId) {
+    motor = new TalonFX(motorId);
     motor.getConfigurator().apply(motorConfig);
   }
 
@@ -36,11 +38,13 @@ public class SingleMotor extends SubsystemBase {
     )
   );
 
-  public Command sysidQuasistatic(SysIdRoutine.Direction direction) {
+  @Override
+  public Command quasistatic(SysIdRoutine.Direction direction) {
     return routine.quasistatic(direction);
   }
 
-  public Command sysidDynamic(SysIdRoutine.Direction direction) {
+  @Override
+  public Command dynamic(SysIdRoutine.Direction direction) {
     return routine.dynamic(direction);
   }
 }

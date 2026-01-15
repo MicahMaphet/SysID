@@ -11,8 +11,10 @@ import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.robot.Contants.SysIdSubsystem;
 
 public class CTRESwerve extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> implements Subsystem {
     public CTRESwerve(
@@ -27,6 +29,7 @@ public class CTRESwerve extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> imp
 
     private final SwerveRequest.SysIdSwerveTranslation translationCharactarization = new SwerveRequest.SysIdSwerveTranslation();
 
+    /** SysID routine to compute drive motor constants */
     private final SysIdRoutine sysIdRoutineTranslation = new SysIdRoutine(
         new SysIdRoutine.Config(
             null,
@@ -41,14 +44,19 @@ public class CTRESwerve extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> imp
         )
     );
 
-    public class Translation {
-        public void dynamic(SysIdRoutine.Direction direction) {
-            sysIdRoutineTranslation.dynamic(direction);
+    public class Translation implements SysIdSubsystem {
+        @Override
+        public Command dynamic(SysIdRoutine.Direction direction) {
+            return sysIdRoutineTranslation.dynamic(direction);
         }
-        public void quasistatic(SysIdRoutine.Direction direction) {
-            sysIdRoutineTranslation.quasistatic(direction);
+
+        @Override
+        public Command quasistatic(SysIdRoutine.Direction direction) {
+            return sysIdRoutineTranslation.quasistatic(direction);
         }
     }
+
+    public final Translation translation = new Translation();
 
     private final SwerveRequest.SysIdSwerveSteerGains steerCharactarization = new SwerveRequest.SysIdSwerveSteerGains();
 
@@ -66,14 +74,19 @@ public class CTRESwerve extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> imp
         )
     );
 
-    public class Steer {
-        public void dynamic(SysIdRoutine.Direction direction) {
-            sysIdRoutineSteer.dynamic(direction);
+    public class Steer implements SysIdSubsystem {
+        @Override
+        public Command dynamic(SysIdRoutine.Direction direction) {
+            return sysIdRoutineSteer.dynamic(direction);
         }
-        public void quasistatic(SysIdRoutine.Direction direction) {
-            sysIdRoutineSteer.quasistatic(direction);
+
+        @Override
+        public Command quasistatic(SysIdRoutine.Direction direction) {
+            return sysIdRoutineSteer.quasistatic(direction);
         }
     }
+
+    public final Steer steer = new Steer();
 
     private final SwerveRequest.SysIdSwerveRotation rotationCharactarization = new SwerveRequest.SysIdSwerveRotation();
 
@@ -91,12 +104,17 @@ public class CTRESwerve extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> imp
         )
     );
 
-    public class Rotation {
-        public void dynamic(SysIdRoutine.Direction direction) {
-            sysIdRoutineRotation.dynamic(direction);
+    public class Rotation implements SysIdSubsystem {
+        @Override
+        public Command dynamic(SysIdRoutine.Direction direction) {
+            return sysIdRoutineRotation.dynamic(direction);
         }
-        public void quasistatic(SysIdRoutine.Direction direction) {
-            sysIdRoutineRotation.quasistatic(direction);
+
+        @Override
+        public Command quasistatic(SysIdRoutine.Direction direction) {
+            return sysIdRoutineRotation.quasistatic(direction);
         }
     }
+
+    public final Rotation rotation = new Rotation();
 }

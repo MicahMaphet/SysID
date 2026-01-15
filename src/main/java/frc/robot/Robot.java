@@ -8,11 +8,10 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandPS4Controller;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
-import frc.robot.subsystems.Arm;
-
+import frc.robot.Contants.SysIdSubsystem;
+import frc.robot.subsystems.SparkMaxSysId;
 
 /**
  * The methods in this class are called automatically corresponding to each mode, as described in
@@ -24,7 +23,7 @@ public class Robot extends TimedRobot {
   private static final String kCustomAuto = "My Auto";
   private String m_autoSelected;
   private final SendableChooser<String> m_chooser = new SendableChooser<>();
-  private final Arm arm = new Arm();
+  private final SparkMaxSysId arm = new SparkMaxSysId(6, false);
 
   private final CommandPS4Controller controller = new CommandPS4Controller(0);
 
@@ -38,10 +37,13 @@ public class Robot extends TimedRobot {
     m_chooser.addOption("My Auto", kCustomAuto);
     SmartDashboard.putData("Auto choices", m_chooser);
 
-    controller.povUp().whileTrue(arm.sysidQuasistatic(Direction.kForward));
-    controller.povDown().whileTrue(arm.sysidQuasistatic(Direction.kReverse));
-    controller.povRight().whileTrue(arm.sysidDynamic(Direction.kForward));
-    controller.povLeft().whileTrue(arm.sysidDynamic(Direction.kReverse));
+    // Set subsystem to the subsystem to run SysID characterization on
+    SysIdSubsystem subsystem = arm;
+
+    controller.povUp().whileTrue(subsystem.quasistatic(Direction.kForward));
+    controller.povDown().whileTrue(subsystem.quasistatic(Direction.kReverse));
+    controller.povRight().whileTrue(subsystem.dynamic(Direction.kForward));
+    controller.povLeft().whileTrue(subsystem.dynamic(Direction.kReverse));
   }
 
   /**
