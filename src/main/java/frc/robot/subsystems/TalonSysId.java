@@ -29,7 +29,7 @@ public class TalonSysId extends SubsystemBase implements SysIdSubsystem {
       null,
       Volts.of(4),
       null,
-      state -> SignalLogger.writeString("SysId Lineaer State", state.toString())
+      state -> SignalLogger.writeString("SysId Linear State", state.toString())
     ),
     new SysIdRoutine.Mechanism(
       output -> motor.setControl(voltageControlRequeset.withOutput(output)),
