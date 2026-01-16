@@ -23,7 +23,7 @@ public class Robot extends TimedRobot {
   private static final String kCustomAuto = "My Auto";
   private String m_autoSelected;
   private final SendableChooser<String> m_chooser = new SendableChooser<>();
-  private final SparkMaxSysId arm = new SparkMaxSysId(6, false);
+  private final SparkMaxSysId sparkMax = new SparkMaxSysId(6, false);
 
   private final CommandPS4Controller controller = new CommandPS4Controller(0);
 
@@ -38,7 +38,7 @@ public class Robot extends TimedRobot {
     SmartDashboard.putData("Auto choices", m_chooser);
 
     // Set subsystem to the subsystem to run SysID characterization on
-    SysIdSubsystem subsystem = arm;
+    SysIdSubsystem subsystem = sparkMax;
 
     controller.povUp().whileTrue(subsystem.quasistatic(Direction.kForward));
     controller.povDown().whileTrue(subsystem.quasistatic(Direction.kReverse));
