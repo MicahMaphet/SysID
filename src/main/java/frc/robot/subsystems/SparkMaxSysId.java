@@ -13,7 +13,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import frc.robot.Contants.SysIdSubsystem;
+import frc.robot.Constants.SysIdSubsystem;
 
 public class SparkMaxSysId extends SubsystemBase implements SysIdSubsystem {
     private SparkMax motor;
@@ -38,12 +38,12 @@ public class SparkMaxSysId extends SubsystemBase implements SysIdSubsystem {
         null,
             Volts.of(4),
             null,
-            state -> DataLogManager.log("SysId Linear State " + state)
+            null
             ),
         new SysIdRoutine.Mechanism(
             output -> motor.setVoltage(output),
-            null,
-            this
+            null, // use the default logging
+            this // log entries will be sysid-test-state-SparkMaxSysId
         )
     );
 

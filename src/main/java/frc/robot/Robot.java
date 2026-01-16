@@ -4,14 +4,16 @@
 
 package frc.robot;
 
+import static frc.robot.Constants.*;
+
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.button.CommandPS4Controller;
+import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
-import frc.robot.Contants.SysIdSubsystem;
 import frc.robot.subsystems.SparkMaxSysId;
+import frc.robot.subsystems.TalonSysId;
 
 /**
  * The methods in this class are called automatically corresponding to each mode, as described in
@@ -19,31 +21,27 @@ import frc.robot.subsystems.SparkMaxSysId;
  * this project, you must also update the Main.java file in the project.
  */
 public class Robot extends TimedRobot {
-  private static final String kDefaultAuto = "Default";
-  private static final String kCustomAuto = "My Auto";
-  private String m_autoSelected;
-  private final SendableChooser<String> m_chooser = new SendableChooser<>();
-  private final SparkMaxSysId sparkMax = new SparkMaxSysId(6, false);
+  private final SendableChooser<SysIdSubsystem> subsystemChooser = new SendableChooser<>();
+  private final SparkMaxSysId sparkMax = new SparkMaxSysId(
+    SparkMaxContants.motorId,
+    SparkMaxContants.brushed
+  );
+  private final TalonSysId talonFX = new TalonSysId(
+    TalonFXConstants.motorId
+  );
 
-  private final CommandPS4Controller controller = new CommandPS4Controller(0);
-
+  // Set this to either ps4Controller or xboxController
+  private final CommandGenericHID controller = ps4Controller;
 
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
    */
   public Robot() {
-    m_chooser.setDefaultOption("Default Auto", kDefaultAuto);
-    m_chooser.addOption("My Auto", kCustomAuto);
-    SmartDashboard.putData("Auto choices", m_chooser);
+    subsystemChooser.setDefaultOption("Spark Max", sparkMax);
+    subsystemChooser.addOption("TalonFX", talonFX);
 
-    // Set subsystem to the subsystem to run SysID characterization on
-    SysIdSubsystem subsystem = sparkMax;
-
-    controller.povUp().whileTrue(subsystem.quasistatic(Direction.kForward));
-    controller.povDown().whileTrue(subsystem.quasistatic(Direction.kReverse));
-    controller.povRight().whileTrue(subsystem.dynamic(Direction.kForward));
-    controller.povLeft().whileTrue(subsystem.dynamic(Direction.kReverse));
+    SmartDashboard.putData("Subsystem Chooser", subsystemChooser);
   }
 
   /**
@@ -58,66 +56,15 @@ public class Robot extends TimedRobot {
     CommandScheduler.getInstance().run();
   }
 
-  /**
-   * This autonomous (along with the chooser code above) shows how to select between different
-   * autonomous modes using the dashboard. The sendable chooser code works with the Java
-   * SmartDashboard. If you prefer the LabVIEW Dashboard, remove all of the chooser code and
-   * uncomment the getString line to get the auto name from the text box below the Gyro
-   *
-   * <p>You can add additional auto modes by adding additional comparisons to the switch structure
-   * below with additional strings. If using the SendableChooser make sure to add them to the
-   * chooser code above as well.
-   */
-  @Override
-  public void autonomousInit() {
-    m_autoSelected = m_chooser.getSelected();
-    // m_autoSelected = SmartDashboard.getString("Auto Selector", kDefaultAuto);
-    System.out.println("Auto selected: " + m_autoSelected);
-  }
-
-  /** This function is called periodically during autonomous. */
-  @Override
-  public void autonomousPeriodic() {
-    switch (m_autoSelected) {
-      case kCustomAuto:
-        // Put custom auto code here
-        break;
-      case kDefaultAuto:
-      default:
-        // Put default auto code here
-        break;
-    }
-  }
-
   /** This function is called once when teleop is enabled. */
   @Override
-  public void teleopInit() {}
+  public void teleopInit() {
+    // Get the selected subsytem to run SysID routines on from Network Tables
+    SysIdSubsystem subsystem = subsystemChooser.getSelected();
 
-  /** This function is called periodically during operator control. */
-  @Override
-  public void teleopPeriodic() {}
-
-  /** This function is called once when the robot is disabled. */
-  @Override
-  public void disabledInit() {}
-
-  /** This function is called periodically when disabled. */
-  @Override
-  public void disabledPeriodic() {}
-
-  /** This function is called once when test mode is enabled. */
-  @Override
-  public void testInit() {}
-
-  /** This function is called periodically during test mode. */
-  @Override
-  public void testPeriodic() {}
-
-  /** This function is called once when the robot is first started up. */
-  @Override
-  public void simulationInit() {}
-
-  /** This function is called periodically whilst in simulation. */
-  @Override
-  public void simulationPeriodic() {}
+    controller.povUp().whileTrue(subsystem.quasistatic(Direction.kForward));
+    controller.povDown().whileTrue(subsystem.quasistatic(Direction.kReverse));
+    controller.povRight().whileTrue(subsystem.dynamic(Direction.kForward));
+    controller.povLeft().whileTrue(subsystem.dynamic(Direction.kReverse));
+  }
 }

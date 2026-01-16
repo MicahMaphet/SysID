@@ -10,7 +10,7 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import frc.robot.Contants.SysIdSubsystem;
+import frc.robot.Constants.SysIdSubsystem;
 
 public class TalonSysId extends SubsystemBase implements SysIdSubsystem {
   private TalonFX motor = new TalonFX(0);
