@@ -2,14 +2,15 @@ package frc.robot.subsystems;
 
 import static edu.wpi.first.units.Units.Volts;
 
-import com.ctre.phoenix6.SignalLogger;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.PersistMode;
 import com.revrobotics.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
+import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Contants.SysIdSubsystem;
@@ -37,7 +38,7 @@ public class SparkMaxSysId extends SubsystemBase implements SysIdSubsystem {
         null,
             Volts.of(4),
             null,
-            state -> SignalLogger.writeString("SysId Lineaer State", state.toString())
+            state -> DataLogManager.log("SysId Linear State " + state)
             ),
         new SysIdRoutine.Mechanism(
             output -> motor.setVoltage(output),
@@ -48,11 +49,19 @@ public class SparkMaxSysId extends SubsystemBase implements SysIdSubsystem {
 
     @Override
     public Command quasistatic(SysIdRoutine.Direction direction) {
-        return routine.quasistatic(direction);
+        return Commands.sequence(
+            Commands.runOnce(DataLogManager::start),
+            routine.quasistatic(direction),
+            Commands.runOnce(DataLogManager::stop)
+        );
     }
 
     @Override
     public Command dynamic(SysIdRoutine.Direction direction) {
-        return routine.dynamic(direction);
+        return Commands.sequence(
+            Commands.runOnce(DataLogManager::start),
+            routine.dynamic(direction),
+            Commands.runOnce(DataLogManager::stop)
+        );
     }
 }
